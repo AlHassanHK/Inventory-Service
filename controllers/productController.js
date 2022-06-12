@@ -140,13 +140,21 @@ exports.updateInventory = async (req, res) => {
   try {
     const items = req.body.cartItems;
     for (const item of items) {
+      const purchaseAmount = item.quantity;
+      console.log("purchaseAmount:", purchaseAmount);
       const currentDbProduct = await products.findById(item._id);
+      console.log("currentDbProduct:", currentDbProduct);
+      const currentItemId = currentDbProduct._id;
+      console.log("currentItemId:", currentItemId);
       const currentItemStock = currentDbProduct.quantity;
-      currentDbProduct.quantity -= currentItemStock;
-      await products.save();
-      res.status(200).send("Successfully updated inventory.");
+      console.log("currentItemStock:", currentItemStock);
+      await products.findByIdAndUpdate(currentItemId, 
+        {$inc: { quantity: -`${purchaseAmount}` },
+      });
     }
+    res.status(200).send("Successfully updated inventory.");
   } catch (error) {
     res.status(400).send(error.message);
+    console.log(error);
   }
 };
