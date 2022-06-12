@@ -20,7 +20,7 @@ router
     .route("/fill-inventory")
     .put(productController.fillInventory);
 
-
+router.route("/update-inventory").put(productController.updateInventory);
 
 
 

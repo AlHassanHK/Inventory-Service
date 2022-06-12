@@ -2,7 +2,8 @@ const products = require("../models/productsModel");
 const APIFeatures = require("../utils/apiFeatures");
 const csvtojson = require("csvtojson");
 //!=================ADD FULL PATH HERE====================
-const csvPath = "C:/Users/hassan/Grocery-marketplace-application/Backend/products-service/Inventory/products.csv";
+const csvPath =
+  "C:/Users/hassan/Grocery-marketplace-application/Backend/products-service/Inventory/products.csv";
 //!=======================================================
 async function insertProductsFromCSV(path) {
   try {
@@ -126,12 +127,26 @@ exports.fillInventory = async (req, res) => {
   try {
     await insertProductsFromCSV(csvPath);
     res.status(201).json({
-        status:"Inventory updated."
+      status: "Inventory updated.",
     });
   } catch (error) {
-      console.log(error);
-      res.status(400).json({
-          status:"Bad request"
-      });
+    console.log(error);
+    res.status(400).json({
+      status: "Bad request",
+    });
+  }
+};
+exports.updateInventory = async (req, res) => {
+  try {
+    const items = req.body.cartItems;
+    for (const item of items) {
+      const currentDbProduct = await products.findById(item._id);
+      const currentItemStock = currentDbProduct.quantity;
+      currentDbProduct.quantity -= currentItemStock;
+      await products.save();
+      res.status(200).send("Successfully updated inventory.");
+    }
+  } catch (error) {
+    res.status(400).send(error.message);
   }
 };
